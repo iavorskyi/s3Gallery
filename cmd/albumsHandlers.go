@@ -1,0 +1,42 @@
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+	s3Gallery "github.com/iavorskyi/s3gallery"
+	"github.com/iavorskyi/s3gallery/Services/albums"
+	"net/http"
+)
+
+func listAlbums(ctx *gin.Context) {
+	albumList, code, err := albums.ListAlbums()
+	if err != nil {
+		s3Gallery.NewErrorResponse(ctx, code, "Failed to get list of albums: "+err.Error())
+		return
+	}
+	ctx.JSON(code, albumList)
+}
+
+func getAlbum(ctx *gin.Context) {
+	albumId := ctx.Param("albumId")
+	album, code, err := albums.GetAlbum(albumId)
+	if err != nil {
+		s3Gallery.NewErrorResponse(ctx, code, "Failed to get album: "+albumId+". "+err.Error())
+		return
+	}
+	ctx.JSON(code, album)
+}
+
+func createAlbum(ctx *gin.Context) {
+	var album s3Gallery.Album
+	err := ctx.BindJSON(&album)
+	if err != nil {
+		s3Gallery.NewErrorResponse(ctx, http.StatusBadRequest, "Failed to unmarshal payload: "+err.Error())
+		return
+	}
+	code, err := albums.CreateAlbum(album.Name)
+	if err != nil {
+		s3Gallery.NewErrorResponse(ctx, code, "Failed to create album: "+album.Name+". "+err.Error())
+		return
+	}
+	ctx.JSON(code, album.Name+" is created")
+}
