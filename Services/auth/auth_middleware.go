@@ -44,7 +44,7 @@ func UserIdentity(ctx *gin.Context) {
 
 	userId, err := ParseToken(headersParts[1])
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, err)
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]interface{}{"message": "not authorized"})
 	}
 	ctx.Set("userId", userId)
 }
