@@ -8,6 +8,7 @@ import (
 )
 
 func listAlbums(ctx *gin.Context) {
+	ctx.Header("Access-Control-Allow-Origin", "*")
 	albumList, code, err := albums.ListAlbums()
 	if err != nil {
 		s3Gallery.NewErrorResponse(ctx, code, "Failed to get list of albums: "+err.Error())

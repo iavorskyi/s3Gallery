@@ -20,6 +20,13 @@ type Album struct {
 	CreationTime time.Time
 }
 
+type Item struct {
+	Type         string    `json:"type"`
+	LastModified time.Time `json:"last-modified"`
+	Album        string    `json:"album"`
+	Name         string    `json:"name"`
+}
+
 type errorResponse struct {
 	Message string `json:"message"`
 }
