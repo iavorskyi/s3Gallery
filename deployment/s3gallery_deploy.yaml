@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s3gallery
+spec:
+  selector:
+    matchLabels:
+      app: s3gallery
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: s3gallery
+    spec:
+      containers:
+        - name: s3gallery
+          image: sunua/s3gallery:v2.1
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: DB_NAME
+              value: "S3Gallery"
+            - name: DB_USER
+              value: "admin"
+            - name: DB_PASSWORD
+              value: "uICklV9e6m2FZ40yRUTfA7gw53OoED81"
+            - name: DB_CONNECTING_STRING
+              value: "185.226.42.227:5432"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "RDH7h1koFYSL9u6eF0O9gj6DWhO4C8L5"
+            - name: AWS_ACCESS_KEY_ID
+              value: "go72hFzS8OE085Sb22cxDXkf4QCeXsu4"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: s3gallery
+  name: s3gallery-svc
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: s3gallery

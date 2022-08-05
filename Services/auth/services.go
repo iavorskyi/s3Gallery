@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-pg/pg/v10"
-	s3Gallery "github.com/iavorskyi/s3gallery"
+	"github.com/iavorskyi/s3gallery/s3Gallery"
 	"time"
 )
 

@@ -6,6 +6,7 @@ import (
 	"github.com/go-pg/pg/v10"
 	"github.com/iavorskyi/s3gallery/DB/postgres"
 	"github.com/iavorskyi/s3gallery/Services/auth"
+	"net/http"
 	"time"
 )
 
@@ -34,7 +35,8 @@ func main() {
 	router.POST("/sign-up", signUp)
 	router.POST("/sign-in", signIn)
 
-	api := router.Group("/api", auth.UserIdentity)
+	api := router.Group("/api")
+	api.GET("/", apiPing)
 
 	users := api.Group("/users")
 	users.GET("/", listUsers)
@@ -42,7 +44,7 @@ func main() {
 	users.PUT("/:id", updateUser)
 	users.DELETE("/:id", deleteUser)
 
-	albums := api.Group("/albums")
+	albums := api.Group("/albums", auth.UserIdentity)
 	albums.GET("/", listAlbums)
 	albums.GET("/:albumId", getAlbum)
 	albums.POST("/", createAlbum)
@@ -54,8 +56,12 @@ func main() {
 	items.PUT("/:id", updateItem)
 	items.DELETE("/:id", deleteItem)
 
-	err := router.Run("localhost:8080")
+	err := router.Run(":8000")
 	if err != nil {
 		panic(err)
 	}
+}
+
+func apiPing(ctx *gin.Context) {
+	ctx.String(http.StatusOK, "PONG")
 }

@@ -2,9 +2,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	s3Gallery "github.com/iavorskyi/s3gallery"
 	"github.com/iavorskyi/s3gallery/Services/items"
+	"github.com/iavorskyi/s3gallery/s3Gallery"
 	"net/http"
+	"os"
 )
 
 func listItems(ctx *gin.Context) {
@@ -40,10 +41,21 @@ func uploadItem(ctx *gin.Context) {
 	albumID := ctx.Param("albumId")
 	code := http.StatusOK
 
-	var opts items.UploadOpts
-	err := ctx.BindJSON(&opts)
+	file, err := ctx.FormFile("image")
+	if err != nil {
+		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to get file from request: "+err.Error())
+		return
+	}
 
-	err = items.UploadItem(opts, albumID)
+	path := file.Filename
+	err = ctx.SaveUploadedFile(file, path)
+	if err != nil {
+		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to save file: "+err.Error())
+		return
+	}
+	defer os.Remove(path)
+
+	err = items.UploadItem(file.Filename, path, albumID)
 	if err != nil {
 		s3Gallery.NewErrorResponse(ctx, code, "Failed to upload item: "+err.Error())
 		return

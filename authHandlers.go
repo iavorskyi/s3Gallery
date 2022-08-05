@@ -2,22 +2,22 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	S3Gallery "github.com/iavorskyi/s3gallery"
 	"github.com/iavorskyi/s3gallery/Services/auth"
+	"github.com/iavorskyi/s3gallery/s3Gallery"
 	"log"
 	"net/http"
 )
 
 func signUp(ctx *gin.Context) {
-	var newUser S3Gallery.User
+	var newUser s3Gallery.User
 	err := ctx.BindJSON(&newUser)
 	if err != nil {
-		S3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
 	}
 	createdUser, err := auth.CreateUser(newUser, db)
 	if err != nil {
-		S3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to create user"+newUser.Email+err.Error())
+		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to create user"+newUser.Email+err.Error())
 		return
 	}
 
@@ -25,7 +25,7 @@ func signUp(ctx *gin.Context) {
 }
 
 func signIn(ctx *gin.Context) {
-	var user S3Gallery.User
+	var user s3Gallery.User
 	err := ctx.BindJSON(&user)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, err.Error())
@@ -35,10 +35,10 @@ func signIn(ctx *gin.Context) {
 	if err != nil {
 		log.Println("Failed to sign in", user.Email, err)
 		ctx.String(http.StatusInternalServerError, err.Error())
-		S3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to sign in"+user.Email+err.Error())
+		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to sign in"+user.Email+err.Error())
 		return
 	}
 
-	ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"token": token})
+	ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"token": token, "user": user.Email})
 
 }
