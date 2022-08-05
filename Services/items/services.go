@@ -4,8 +4,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	awsS3 "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	s3Gallery "github.com/iavorskyi/s3gallery"
 	"github.com/iavorskyi/s3gallery/Services/s3"
+	"github.com/iavorskyi/s3gallery/s3Gallery"
 	"github.com/nfnt/resize"
 	"image"
 	"image/jpeg"
@@ -67,19 +67,19 @@ func GetItem(bucketID, itemID string) (s3Gallery.Item, int, error) {
 	return itemSummary, http.StatusOK, nil
 }
 
-func UploadItem(opts UploadOpts, bucketID string) error {
-	err := upload(opts, bucketID)
+func UploadItem(fileName, path, bucketID string) error {
+	err := upload(fileName, path, bucketID)
 	if err != nil {
 		return err
 	}
 
-	tempFile, err := os.Create("./rzdImg" + opts.Name + ".jpeg")
+	tempFile, err := os.Create("./rzdImg" + fileName + ".jpeg")
 	if err != nil {
 		return err
 	}
-	defer os.Remove("./rzdImg" + opts.Name + ".jpeg")
+	defer os.Remove("./rzdImg" + fileName + ".jpeg")
 
-	fileToResize, err := os.Open(opts.Path)
+	fileToResize, err := os.Open(path)
 	if err != nil {
 		return err
 	}
@@ -95,8 +95,9 @@ func UploadItem(opts UploadOpts, bucketID string) error {
 		return err
 	}
 
-	resizedImgOpts := UploadOpts{Name: "resized/" + opts.Name, Path: "./rzdImg" + opts.Name + ".jpeg"}
-	err = upload(resizedImgOpts, bucketID)
+	resizedFileName := "resized/" + fileName
+	resizedFilePath := "./rzdImg" + fileName + ".jpeg"
+	err = upload(resizedFileName, resizedFilePath, bucketID)
 	if err != nil {
 		return err
 	}
@@ -146,8 +147,8 @@ func DeleteItem(bucket, item string) error {
 	return nil
 }
 
-func upload(opts UploadOpts, bucket string) error {
-	file, err := os.Open(opts.Path)
+func upload(fileName, path, bucket string) error {
+	file, err := os.Open(path)
 	if err != nil {
 		return err
 	}
@@ -156,9 +157,9 @@ func upload(opts UploadOpts, bucket string) error {
 	uploader, err := s3.GetManager()
 	item := &s3manager.UploadInput{
 		Bucket:   aws.String(bucket),
-		Key:      aws.String(opts.Name),
+		Key:      aws.String(fileName),
 		Body:     file,
-		Metadata: map[string]*string{"format": aws.String(opts.Format)},
+		Metadata: map[string]*string{"format": aws.String(".jpeg")},
 		ACL:      aws.String("public-read"),
 	}
 	_, err = uploader.Upload(item)

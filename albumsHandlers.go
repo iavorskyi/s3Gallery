@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	s3Gallery "github.com/iavorskyi/s3gallery"
 	"github.com/iavorskyi/s3gallery/Services/albums"
+	"github.com/iavorskyi/s3gallery/s3Gallery"
 	"net/http"
 )
 
