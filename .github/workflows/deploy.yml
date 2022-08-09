@@ -44,8 +44,8 @@ jobs:
           context: .
           # Note: tags has to be all lower-case
           tags: |
-            oskardudycz/eventsourcing.nodejs.simple:latest 
-            ghcr.io/oskardudycz/eventsourcing.nodejs/simple:latest
+            sunua/gh-s3gallery:latest 
+            ghcr.io/sunua/gh-s3gallery:latest
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
 
