@@ -48,6 +48,7 @@ jobs:
   deploy_on_cluster:
     name: Deploy on k8s cluster
     runs-on: ubuntu-latest
+    needs: build-and-push-docker-image
 
     steps:
       - uses: azure/k8s-set-context@v1
@@ -60,5 +61,5 @@ jobs:
         with:
           namespace: 'default'
           manifests: |
-            deployment/s3gallery_deploy.yaml
+            deployment/
           images: 'sunua/gh-s3gallery:latest'
