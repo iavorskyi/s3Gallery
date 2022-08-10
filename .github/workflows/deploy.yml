@@ -47,7 +47,7 @@ jobs:
 
   deploy_on_cluster:
     name: Deploy on k8s cluster
-    runs-on: ubuntu latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: azure/k8s-set-context@v1
