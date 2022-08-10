@@ -40,7 +40,25 @@ jobs:
           tags: |
             sunua/gh-s3gallery:latest
           # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'refs/heads/main' }}
+          # push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+  deploy_on_cluster:
+    name: Deploy on k8s cluster
+    runs-on: ubuntu latest
+
+    steps:
+      - uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG}} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+#          context: <context name>  #If left unspecified, current-context from kubeconfig is used as default
+        id: setcontext
+      - uses: Azure/k8s-deploy@v3.1
+        with:
+          namespace: 'default'
+          manifests: |
+            deployment/s3gallery_deploy.yaml
+          images: 'sunua/gh-s3gallery:latest'
