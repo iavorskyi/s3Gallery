@@ -61,5 +61,5 @@ jobs:
         with:
           namespace: 'default'
           manifests: |
-            ./deployment
+            ./
           images: 'sunua/gh-s3gallery:latest'
