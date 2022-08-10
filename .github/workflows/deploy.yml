@@ -16,8 +16,8 @@ jobs:
       - name: Build
         run: |
 #          SHA=${GITHUB_SHA:0:7}
-          APP=${GITHUB_REPOSITORY#*/}
-          DOCKER_URL= ${{ secrets.REGISTRY_REPO }}/${APP}/${APP}:latest
+#          APP=${GITHUB_REPOSITORY#*/}
+          DOCKER_URL= sunua/s3gal:latest
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
           docker build . --no-cache -f Dockerfile -t ${DOCKER_URL} --build-arg ACCESS_TOKEN_USR=${{ secrets.DOCKERHUB_USERNAME }} --build-arg ACCESS_TOKEN_PWD=${{ secrets.DOCKERHUB_TOKEN }}
           docker push ${DOCKER_URL}
