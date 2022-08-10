@@ -1,0 +1,51 @@
+name: ci-main-pr
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "README.md"
+
+jobs:
+  #building app
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Build
+        run: |
+#          SHA=${GITHUB_SHA:0:7}
+#          APP=${GITHUB_REPOSITORY#*/}
+          DOCKER_URL= sunua/s3gal:latest
+          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker build . --no-cache -f Dockerfile -t ${DOCKER_URL} --build-arg ACCESS_TOKEN_USR=${{ secrets.DOCKERHUB_USERNAME }} --build-arg ACCESS_TOKEN_PWD=${{ secrets.DOCKERHUB_TOKEN }}
+          docker push ${DOCKER_URL}
+#  #deploy to Kubernetes
+#  deploy:
+#    name: Deploy in dev
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#      - name: Set context
+#        uses: azure/k8s-set-context@v1
+#        with:
+#          method: kubeconfig
+#          kubeconfig: ${{ secrets.KUBE_CONFIG_DEV }}
+#        id: setcontext
+#      - name: Deploy
+#        run: |
+#          SHA=${GITHUB_SHA:0:7}
+#          APP=${GITHUB_REPOSITORY#*/}
+#          DOCKER_URL=${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_REPO }}/${APP}/${APP}:${SHA}
+#          sed -i "s,IMG,${DOCKER_URL},g" ./yamls/deployment.yaml
+#          sed -i "s,APP_NAME,${APP},g" ./yamls/deployment.yaml
+#          sed -i "s,PASSCODE_VALUE,${{ secrets.PASSCODE }},g" ./yamls/deployment.yaml
+#          sed -i "s,DB_CONNECTION_STRING_VALUE,${{ secrets.DEV_DB_CONNECTION_STRING }},g" ./yamls/deployment.yaml
+#          sed -i "s,DB_USER_VALUE,${{ secrets.DEV_DB_USER }},g" ./yamls/deployment.yaml
+#          sed -i "s,DB_PASSWORD_VALUE,${{ secrets.DEV_DB_PASSWORD }},g" ./yamls/deployment.yaml
+#          sed -i "s,DB_NAME_VALUE,${{ secrets.DEV_DB_NAME }},g" ./yamls/deployment.yaml
+#          sed -i "s,TRANSACTION_TIMEOUT_IN_SECONDS_VALUE,${{ secrets.TRANSACTION_TIMEOUT_IN_SECONDS }},g" ./yamls/deployment.yaml
+#          kubectl apply -f ./yamls/deployment.yaml
