@@ -57,8 +57,10 @@ jobs:
           kubeconfig: ${{ secrets.KUBECONFIG}} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
 #          context: <context name>  #If left unspecified, current-context from kubeconfig is used as default
         id: setcontext
+      - name: Checkout source code
+        uses: actions/checkout@v3
       - uses: Azure/k8s-deploy@v3.1
         with:
           manifests: |
-            s3gallery_deploy.yaml
+            deployment/s3gallery_deploy.yaml
           images: 'sunua/gh-s3gallery:latest'
