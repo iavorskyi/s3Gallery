@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: s3gallery
-          image: sunua/gh-s3gallery:prod
+          image: sunua/gh-s3gallery:dev
           ports:
             - name: http
               containerPort: 8000
