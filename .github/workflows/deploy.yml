@@ -39,8 +39,8 @@ jobs:
           context: .
           # Note: tags has to be all lower-case
           run: | 
-                echo "${GITHUB_SHA}"
-                echo "$GITHUB_SHA"
+                echo "GITGUB_SHA = ${GITHUB_SHA}"
+                echo "GITGUB_SHA = $GITHUB_SHA"
           tags: |
             sunua/gh-s3gallery:${{ github.sha }}
           # build on feature branches, push only on main branch
