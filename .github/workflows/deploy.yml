@@ -24,11 +24,12 @@ jobs:
         id: short-sha
         with:
           length: 7
-            - env:
-                SHA: ${{ steps.short-sha.outputs.sha }}
-            - run: echo $SHA
-              env:
-                SHA: ${{ env.SHA }}
+      - run: echo $SHA
+        env:
+          SHA: ${{ steps.short-sha.outputs.sha }}
+      - run: echo $SHA
+        env:
+          SHA: ${{ env.SHA }}
 
 
       # setup Docker buld action
