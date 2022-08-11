@@ -48,7 +48,7 @@ jobs:
           context: .
           # Note: tags has to be all lower-case
           tags: |
-            sunua/gh-s3gallery:${{ github.sha }}
+            sunua/gh-s3gallery:${{ env.SHA }}
           # build on feature branches, push only on main branch
           push: ${{ true }}
 
