@@ -9,7 +9,7 @@ on:
 
 env:
     TAG: ${{ github.event_name == 'pull_request' && 'dev' || 'prod' }}
-    MANIFEST_PATH: ${{env.TAG == 'prod' && 'deployment/s3gallery_deploy.yaml' || 'deployment/s3gallery_deploy_dev.yaml' }}
+    MANIFEST_PATH: ${{ github.event_name != 'pull_request' && 'deployment/s3gallery_deploy.yaml' || 'deployment/s3gallery_deploy_dev.yaml' }}
 jobs:
   # define job to build and publish docker image
   build-and-push-docker-image:
