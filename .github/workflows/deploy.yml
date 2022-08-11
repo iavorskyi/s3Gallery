@@ -35,12 +35,12 @@ jobs:
         uses: benjlevesque/short-sha@v1.2
         with:
           length: 7
-            - run: echo $SHA
-              env:
-                SHA: ${{ steps.short-sha.outputs.sha }}
-            - run: echo $SHA
-              env:
-                SHA: ${{ env.SHA }}
+        - run: echo $SHA
+          env:
+            SHA: ${{ steps.short-sha.outputs.sha }}
+        - run: echo $SHA
+          env:
+            SHA: ${{ env.SHA }}
       - name: Build image and push to Docker Hub and GitHub Container Registry
         uses: docker/build-push-action@v2
         with:
