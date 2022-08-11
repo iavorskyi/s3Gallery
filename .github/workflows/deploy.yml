@@ -7,6 +7,8 @@ on:
   # run it during pull request
   pull_request:
 
+env:
+    TAG: ${{ github.event_name == 'pull_request' && 'dev' || 'prod' }}
 jobs:
   # define job to build and publish docker image
   build-and-push-docker-image:
@@ -46,9 +48,8 @@ jobs:
           # relative path to the place where source code with Dockerfile is located
           context: .
           # Note: tags has to be all lower-case
-
           tags: |
-            sunua/gh-s3gallery:${{ env.SHA }}
+            sunua/gh-s3gallery:${{ env.TAG }}
           # build on feature branches, push only on main branch
           push: ${{ true }}
 
