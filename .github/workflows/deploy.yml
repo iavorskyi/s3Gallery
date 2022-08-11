@@ -29,7 +29,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Create short SHA
         id: short-sha
         uses: benjlevesque/short-sha@v1.2
