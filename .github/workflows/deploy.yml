@@ -8,7 +8,8 @@ on:
   pull_request:
 
 env:
-    TAG: ${{ github.event_name == 'pull_request' && 'prod' || 'dev' }}
+    TAG: ${{ github.event_name == 'pull_request' && 'dev' || 'prod' }}
+    MANIFEST_PATH: ${{env.TAG == 'prod' && 'deployment/s3gallery_deploy.yaml' || 'deployment/s3gallery_deploy_dev.yaml' }}
 jobs:
   # define job to build and publish docker image
   build-and-push-docker-image:
@@ -73,5 +74,5 @@ jobs:
       - uses: Azure/k8s-deploy@v3.1
         with:
           manifests: |
-            deployment/s3gallery_deploy.yaml
+            ${{env.MANIFEST_PATH}}
           images: 'sunua/gh-s3gallery:latest'
