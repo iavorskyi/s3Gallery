@@ -9,8 +9,6 @@ on:
 
 env:
     TAG: ${{ github.event_name == 'pull_request' && 'dev' || 'prod' }}
-    IMAGE_NAME: ${{ github.event_name != 'pull_request' && 'sunua/gh-s3gallery:dev' || 'sunua/gh-s3gallery:prod' }}
-    SHA: ''
 jobs:
   # define job to build and publish docker image
   build-and-push-docker-image:
