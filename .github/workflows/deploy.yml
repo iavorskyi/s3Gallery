@@ -70,6 +70,15 @@ jobs:
           kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
 #          context: <context name>  #If left unspecified, current-context from kubeconfig is used as default
         id: setcontext
+      - name: Create short SHA
+        uses: benjlevesque/short-sha@v1.2
+        id: short-sha
+        with:
+          length: 7
+      - run: echo $SHA
+        env:
+          SHA: ${{ steps.short-sha.outputs.sha }}
+      - run: echo ${{ github.event_name }}
       - name: Checkout source code
         uses: actions/checkout@v3
       - uses: Azure/k8s-deploy@v3.1
