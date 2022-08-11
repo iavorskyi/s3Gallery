@@ -37,8 +37,10 @@ jobs:
           # relative path to the place where source code with Dockerfile is located
           context: .
           # Note: tags has to be all lower-case
+          run: echo "${GITHUB_SHA}"
+          run: echo "$GITHUB_SHA"
           tags: |
-            sunua/gh-s3gallery:latest
+            sunua/gh-s3gallery:${{ github.sha }}
           # build on feature branches, push only on main branch
           push: ${{ true }}
 
@@ -54,7 +56,7 @@ jobs:
       - uses: azure/k8s-set-context@v1
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG}} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+          kubeconfig: ${{ secrets.KUBECONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
 #          context: <context name>  #If left unspecified, current-context from kubeconfig is used as default
         id: setcontext
       - name: Checkout source code
