@@ -27,7 +27,7 @@ jobs:
       - run: echo $SHA
         env:
           SHA: ${{ steps.short-sha.outputs.sha }}
-      - run: echo $github.event_name
+      - run: echo ${{ github.event_name }}
 
       # setup Docker buld action
       - name: Set up Docker Buildx
