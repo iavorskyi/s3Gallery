@@ -33,12 +33,14 @@ jobs:
 
       - name: Build image and push to Docker Hub and GitHub Container Registry
         uses: docker/build-push-action@v2
+
         with:
           # relative path to the place where source code with Dockerfile is located
           context: .
           # Note: tags has to be all lower-case
-          run: echo "${GITHUB_SHA}"
-          run: echo "$GITHUB_SHA"
+          run: | 
+                echo "${GITHUB_SHA}"
+                echo "$GITHUB_SHA"
           tags: |
             sunua/gh-s3gallery:${{ github.sha }}
           # build on feature branches, push only on main branch
