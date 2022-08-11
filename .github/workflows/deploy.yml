@@ -75,4 +75,4 @@ jobs:
         with:
           manifests: |
             ${{env.MANIFEST_PATH}}
-          images: 'sunua/gh-s3gallery:latest'
+#          images: 'sunua/gh-s3gallery:latest'
