@@ -9,7 +9,7 @@ on:
 
 env:
     TAG: ${{ github.event_name == 'pull_request' && 'dev' || 'prod' }}
-    MANIFEST_PATH: ${{ github.event_name != 'pull_request' && 'deployment/s3gallery_deploy.yaml' || 'deployment/s3gallery_deploy_dev.yaml' }}
+    IMAGE_NAME: ${{ github.event_name != 'pull_request' && 'sunua/gh-s3gallery:dev' || 'sunua/gh-s3gallery:prod' }}
 jobs:
   # define job to build and publish docker image
   build-and-push-docker-image:
@@ -50,7 +50,7 @@ jobs:
           context: .
           # Note: tags has to be all lower-case
           tags: |
-            sunua/gh-s3gallery:${{ env.TAG }}
+            sunua/gh-s3gallery:${{ env.SHA }}-${{ env.TAG }}
           # build on feature branches, push only on main branch
           push: ${{ true }}
 
@@ -74,5 +74,5 @@ jobs:
       - uses: Azure/k8s-deploy@v3.1
         with:
           manifests: |
-            ${{env.MANIFEST_PATH}}
-#          images: 'sunua/gh-s3gallery:'
+            deployment/s3gallery_deploy.yaml
+          images: sunua/gh-s3gallery:${{ env.SHA }}-${{ env.TAG }}
