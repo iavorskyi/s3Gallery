@@ -81,9 +81,9 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
       - name: "Create development environments namespace"
-      uses: okteto/create-namespace@latest
-      with:
-        namespace: dev
+        uses: okteto/create-namespace@latest
+        with:
+          namespace: dev
       - uses: Azure/k8s-deploy@v3.1
         with:
           namespace: ${{ env.NAMESPACE }}
