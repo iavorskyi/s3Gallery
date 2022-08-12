@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: s3gallery
+  namespace: default
 spec:
   selector:
     matchLabels:
