@@ -9,6 +9,7 @@ on:
 
 env:
     TAG: ${{ github.event_name == 'pull_request' && 'dev' || 'prod' }}
+    NAMESPACE: ${{ github.event_name == 'pull_request' && 'dev' || 'default' }}
 jobs:
   # define job to build and publish docker image
   build-and-push-docker-image:
@@ -81,6 +82,7 @@ jobs:
         uses: actions/checkout@v3
       - uses: Azure/k8s-deploy@v3.1
         with:
+          namespace: ${{ env.NAMESPACE }}
           manifests: |
             deployment/s3gallery_deploy.yaml
           images: sunua/gh-s3gallery:${{ env.SHA }}-${{ env.TAG }}
