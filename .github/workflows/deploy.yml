@@ -82,7 +82,7 @@ jobs:
         uses: actions/checkout@v3
       - uses: azure/k8s-create-secret@v2
         with:
-          namespace: 'default'
+          namespace: ${{ env.NAMESPACE }}
           secret-type: 'generic'
           secret-name: db-config
           data: ${{ secrets.database-config }}
