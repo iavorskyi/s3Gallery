@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-pg/pg/v10"
+	database "github.com/iavorskyi/s3gallery/internal/db"
 	"github.com/iavorskyi/s3gallery/s3Gallery"
+	"log"
 	"time"
 )
 
@@ -20,19 +21,19 @@ type tokenClaims struct {
 	UserId int `json:"user_id"`
 }
 
-func CreateUser(user s3Gallery.User, db *pg.DB) (s3Gallery.User, error) {
+func CreateUser(user s3Gallery.User, db *database.Database) (s3Gallery.User, error) {
 	var createdUser s3Gallery.User
 
 	user.Password = hashPassword(user.Password)
 	if !validateEmail(user.Email) {
 		return createdUser, errors.New("email is not valid")
 	}
-	_, err := db.Model(&user).Insert()
+	_, err := db.DBInstance.Model(&user).Insert()
 	if err != nil {
 		return createdUser, err
 	}
 
-	err = db.Model(&createdUser).Where("email = ?", user.Email).Select()
+	err = db.DBInstance.Model(&createdUser).Where("email = ?", user.Email).Select()
 	if err != nil {
 		return createdUser, err
 	}
@@ -49,9 +50,10 @@ func validateEmail(email string) bool {
 	return true
 }
 
-func GenerateToken(user s3Gallery.User, db *pg.DB) (string, error) {
+func GenerateToken(user s3Gallery.User, db *database.Database) (string, error) {
 	var userId int
-	err := db.Model((*s3Gallery.User)(nil)).
+	log.Println("TEST:", db)
+	err := db.DBInstance.Model((*s3Gallery.User)(nil)).
 		Column("id").
 		Where("email=?", user.Email).
 		Where("password=?", hashPassword(user.Password)).

@@ -6,7 +6,7 @@ RUN apk add --no-cache
 RUN mkdir /app
 COPY . /app
 WORKDIR /app
-RUN GOOS=linux go build -o s3gallery /app/App
+RUN GOOS=linux go build -o s3gallery /app/cmd
 
 
 FROM alpine

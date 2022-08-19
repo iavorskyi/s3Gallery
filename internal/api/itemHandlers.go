@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"github.com/gin-gonic/gin"
@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func listItems(ctx *gin.Context) {
+func (s *APIServer) listItems(ctx *gin.Context) {
 	var user s3Gallery.User
 	albumID := ctx.Param("albumId")
 	itemList, code, err := items.ListItems(albumID)
@@ -20,7 +20,7 @@ func listItems(ctx *gin.Context) {
 	ctx.IndentedJSON(code, itemList)
 }
 
-func getItem(ctx *gin.Context) {
+func (s *APIServer) getItem(ctx *gin.Context) {
 	isFullSize := ctx.Query("full-size")
 	albumID := ctx.Param("albumId")
 	itemID := ctx.Param("id")
@@ -37,7 +37,7 @@ func getItem(ctx *gin.Context) {
 	ctx.JSON(code, item)
 }
 
-func uploadItem(ctx *gin.Context) {
+func (s *APIServer) uploadItem(ctx *gin.Context) {
 	albumID := ctx.Param("albumId")
 	code := http.StatusOK
 
@@ -63,11 +63,11 @@ func uploadItem(ctx *gin.Context) {
 	ctx.String(code, "Done")
 }
 
-func updateItem(ctx *gin.Context) {
+func (s *APIServer) updateItem(ctx *gin.Context) {
 
 }
 
-func deleteItem(ctx *gin.Context) {
+func (s *APIServer) deleteItem(ctx *gin.Context) {
 	albumID := ctx.Param("albumId")
 	code := http.StatusOK
 	id := ctx.Param("id")

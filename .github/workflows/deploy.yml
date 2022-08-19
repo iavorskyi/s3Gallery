@@ -80,6 +80,12 @@ jobs:
       - run: echo ${{ github.event_name }}
       - name: Checkout source code
         uses: actions/checkout@v3
+      - uses: azure/k8s-create-secret@v2
+        with:
+          namespace: ${{ env.NAMESPACE }}
+          secret-type: 'generic'
+          secret-name: database-config
+          data: ${{ secrets.DB_CONFIG }}
       - uses: Azure/k8s-deploy@v3.1
         with:
           namespace: ${{ env.NAMESPACE }}
