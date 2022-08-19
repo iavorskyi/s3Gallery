@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func listAlbums(ctx *gin.Context) {
+func (s *APIServer) listAlbums(ctx *gin.Context) {
 	ctx.Header("Access-Control-Allow-Origin", "*")
 	albumList, code, err := albums.ListAlbums()
 	if err != nil {
@@ -17,7 +17,7 @@ func listAlbums(ctx *gin.Context) {
 	ctx.JSON(code, albumList)
 }
 
-func getAlbum(ctx *gin.Context) {
+func (s *APIServer) getAlbum(ctx *gin.Context) {
 	albumId := ctx.Param("albumId")
 	album, code, err := albums.GetAlbum(albumId)
 	if err != nil {
@@ -27,7 +27,7 @@ func getAlbum(ctx *gin.Context) {
 	ctx.JSON(code, album)
 }
 
-func createAlbum(ctx *gin.Context) {
+func (s *APIServer) createAlbum(ctx *gin.Context) {
 	var album s3Gallery.Album
 	err := ctx.BindJSON(&album)
 	if err != nil {

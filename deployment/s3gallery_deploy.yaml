@@ -21,13 +21,25 @@ spec:
               containerPort: 8000
           env:
             - name: DB_NAME
-              value: "S3Gallery"
+              valueFrom:
+                secretKeyRef:
+                  name: database-config
+                  key: DB_NAME
             - name: DB_USER
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: database-config
+                  key: DB_USER
             - name: DB_PASSWORD
-              value: "uICklV9e6m2FZ40yRUTfA7gw53OoED81"
-            - name: DB_CONNECTING_STRING
-              value: "185.226.42.227:5432"
+              valueFrom:
+                secretKeyRef:
+                  name: database-config
+                  key: DB_PASSWORD
+            - name: DB_CONN_STR
+              valueFrom:
+                secretKeyRef:
+                  name: database-config
+                  key: DB_CONN_STR
             - name: AWS_SECRET_ACCESS_KEY
               value: "RDH7h1koFYSL9u6eF0O9gj6DWhO4C8L5"
             - name: AWS_ACCESS_KEY_ID

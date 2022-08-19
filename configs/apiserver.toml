@@ -1,0 +1,6 @@
+bind_addr = ":8000"
+log_level = "debug"
+name = "S3Gallery"
+user = "admin"
+password = "uICklV9e6m2FZ40yRUTfA7gw53OoED81"
+connect_str = "185.226.42.227:5432"
