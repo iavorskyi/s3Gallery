@@ -6,15 +6,6 @@ import (
 	"time"
 )
 
-type User struct {
-	tableName struct{} `pg:"users"`
-	ID        string   `json:"id"`
-	Email     string   `json:"email" binding:"required"`
-	FirstName string   `json:"first_name,omitempty"`
-	LastName  string   `json:"last_name,omitempty"`
-	Password  string   `json:"password" binding:"required"`
-}
-
 type Album struct {
 	Name         string
 	CreationTime time.Time

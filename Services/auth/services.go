@@ -2,12 +2,12 @@ package auth
 
 import (
 	"crypto/sha1"
-	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	database "github.com/iavorskyi/s3gallery/internal/db"
-	"github.com/iavorskyi/s3gallery/s3Gallery"
-	"log"
+	"github.com/iavorskyi/s3gallery/internal/model"
+	"github.com/iavorskyi/s3gallery/internal/store"
+	database "github.com/iavorskyi/s3gallery/internal/store/sqlStore"
+
 	"time"
 )
 
@@ -21,59 +21,45 @@ type tokenClaims struct {
 	UserId int `json:"user_id"`
 }
 
-func CreateUser(user s3Gallery.User, db *database.Database) (s3Gallery.User, error) {
-	var createdUser s3Gallery.User
-
-	user.Password = hashPassword(user.Password)
-	if !validateEmail(user.Email) {
-		return createdUser, errors.New("email is not valid")
-	}
-	_, err := db.DBInstance.Model(&user).Insert()
+func CreateUser(user model.User, db store.Store) (*model.User, error) {
+	err := db.User().Create(&user)
 	if err != nil {
-		return createdUser, err
+		return nil, err
 	}
 
-	err = db.DBInstance.Model(&createdUser).Where("email = ?", user.Email).Select()
-	if err != nil {
-		return createdUser, err
-	}
-	return createdUser, nil
+	return &user, nil
 }
 
-func hashPassword(password string) string {
+func HashPassword(password string) string {
 	hash := sha1.New()
 	hash.Sum([]byte(password))
 	return fmt.Sprintf("%x", hash.Sum([]byte("secret")))
 }
 
-func validateEmail(email string) bool {
-	return true
-}
+func GenerateToken(user model.User, db *database.Database) (string, error) {
+	//var userId int
+	//log.Println("TEST:", db)
+	//err := db.DBInstance.Model((*s3Gallery.User)(nil)).
+	//	Column("id").
+	//	Where("email=?", user.Email).
+	//	Where("password=?", (user.Password)).
+	//	Select(&userId)
+	//if err != nil {
+	//	return "", err
+	//}
+	//
+	//token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+	//	jwt.StandardClaims{
+	//		ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+	//		IssuedAt:  time.Now().Unix(),
+	//	},
+	//	userId,
+	//})
+	//
+	//signedToken, err := token.SignedString([]byte(signingKey))
+	//if err != nil {
+	//	return "", err
+	//}
 
-func GenerateToken(user s3Gallery.User, db *database.Database) (string, error) {
-	var userId int
-	log.Println("TEST:", db)
-	err := db.DBInstance.Model((*s3Gallery.User)(nil)).
-		Column("id").
-		Where("email=?", user.Email).
-		Where("password=?", hashPassword(user.Password)).
-		Select(&userId)
-	if err != nil {
-		return "", err
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-		userId,
-	})
-
-	signedToken, err := token.SignedString([]byte(signingKey))
-	if err != nil {
-		return "", err
-	}
-
-	return signedToken, nil
+	return "signedToken", nil
 }
