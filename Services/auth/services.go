@@ -33,7 +33,7 @@ func CreateUser(user model.User, db store.Store) (*model.User, error) {
 func HashPassword(password string) string {
 	hash := sha1.New()
 	hash.Sum([]byte(password))
-	return fmt.Sprintf("%x", hash.Sum([]byte("secret")))
+	return fmt.Sprintf("%x", hash.Sum([]byte("secretю")))
 }
 
 func GenerateToken(user model.User, db *database.Database) (string, error) {
