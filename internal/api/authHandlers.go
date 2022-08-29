@@ -5,6 +5,7 @@ import (
 	"github.com/iavorskyi/s3gallery/Services/auth"
 	"github.com/iavorskyi/s3gallery/internal/model"
 	"github.com/iavorskyi/s3gallery/s3Gallery"
+	"log"
 	"net/http"
 )
 
@@ -24,22 +25,21 @@ func (s *server) signUp(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusCreated, createdUser)
 }
 
-//
-//func (s *Server) signIn(ctx *gin.Context) {
-//	var user model.User
-//	err := ctx.BindJSON(&user)
-//	if err != nil {
-//		ctx.String(http.StatusBadRequest, err.Error())
-//		return
-//	}
-//	token, err := auth.GenerateToken(user, s.store)
-//	if err != nil {
-//		log.Println("Failed to sign in", user.Email, err)
-//		ctx.String(http.StatusInternalServerError, err.Error())
-//		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to sign in"+user.Email+err.Error())
-//		return
-//	}
-//
-//	ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"token": token, "user": user.Email})
-//
-//}
+func (s *server) signIn(ctx *gin.Context) {
+	var user model.User
+	err := ctx.BindJSON(&user)
+	if err != nil {
+		ctx.String(http.StatusBadRequest, err.Error())
+		return
+	}
+	token, err := auth.GenerateToken(user, s.store)
+	if err != nil {
+		log.Println("Failed to sign in", user.Email, err)
+		ctx.String(http.StatusInternalServerError, err.Error())
+		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to sign in"+user.Email+err.Error())
+		return
+	}
+
+	ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"token": token, "user": user.Email})
+
+}

@@ -30,8 +30,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) configureRouter() {
 	s.router.POST("/sign-up", s.signUp)
-	//s.router.POST("/sign-in", s.signIn)
-	//
+	s.router.POST("/sign-in", s.signIn)
+
 	//api := s.router.Group("/api")
 	//api.GET("/", s.apiPing)
 	//

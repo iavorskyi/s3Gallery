@@ -5,6 +5,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/iavorskyi/s3gallery/internal/api"
 	"log"
+	"os"
 )
 
 var (
@@ -22,6 +23,10 @@ func main() {
 	if err != nil {
 		log.Println("app configs:", err)
 	}
+	config.DBName = os.Getenv("DB_NAME")
+	config.DBUser = os.Getenv("DB_USER")
+	config.DBPassword = os.Getenv("DB_PASSWORD")
+	config.DBConnectStr = os.Getenv("DB_CONN_STR")
 
 	if err := api.Start(config); err != nil {
 		log.Fatal(err)
