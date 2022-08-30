@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"github.com/go-pg/pg/v10"
+	awsStore "github.com/iavorskyi/s3gallery/internal/store/awsS3"
 	"github.com/iavorskyi/s3gallery/internal/store/sqlStore"
 	"log"
 	"net/http"
@@ -15,8 +16,11 @@ func Start(config *Config) error {
 	}
 	defer db.Close()
 
+	s3, err := awsStore.GetClient()
+
 	store := sqlStore.New(db)
-	srv := newServer(store)
+	s3store := awsStore.New(s3)
+	srv := newServer(store, s3store)
 	log.Println("Starting on", config.BindAddr, "port")
 
 	return http.ListenAndServe(config.BindAddr, srv)

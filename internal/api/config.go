@@ -8,6 +8,7 @@ type Config struct {
 	DBUser       string `toml:"user"`
 	DBName       string `toml:"name"`
 	DBPassword   string `toml:"password"`
+	S3Endpoint   string `toml:"s3endpoint"`
 }
 
 // NewConfig ...

@@ -4,7 +4,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	awsS3 "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/iavorskyi/s3gallery/Services/s3"
+	"github.com/iavorskyi/s3gallery/internal/store"
+	awsStore "github.com/iavorskyi/s3gallery/internal/store/awsS3"
 	"github.com/iavorskyi/s3gallery/s3Gallery"
 	"github.com/nfnt/resize"
 	"image"
@@ -15,19 +16,12 @@ import (
 	"strings"
 )
 
-func ListItems(id string) ([]s3Gallery.Item, int, error) {
-	client, err := s3.GetClient()
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
-
+func ListItems(id string, store store.S3Store) ([]s3Gallery.Item, int, error) {
 	// Get the list of items
-	results, err := client.ListObjectsV2(&awsS3.ListObjectsV2Input{Bucket: aws.String(id)})
+	results, err := store.Item().ListItemsByAlbumId(id)
 	if err != nil {
-		log.Println(err)
 		return nil, http.StatusInternalServerError, err
 	}
-
 	var resultList []s3Gallery.Item
 	for _, i := range results.Contents {
 		if strings.Contains(*i.Key, "resized/") {
@@ -37,16 +31,14 @@ func ListItems(id string) ([]s3Gallery.Item, int, error) {
 			}
 			resultList = append(resultList, itemToList)
 		}
-
 	}
-
 	return resultList, http.StatusOK, nil
 }
 
 func GetItem(bucketID, itemID string) (s3Gallery.Item, int, error) {
 	var item *awsS3.GetObjectOutput
 
-	client, err := s3.GetClient()
+	client, err := awsStore.GetClient()
 	if err != nil {
 		return s3Gallery.Item{}, http.StatusInternalServerError, err
 	}
@@ -106,7 +98,7 @@ func UploadItem(fileName, path, bucketID string) error {
 }
 
 func DeleteItem(bucket, item string) error {
-	client, err := s3.GetClient()
+	client, err := awsStore.GetClient()
 	if err != nil {
 		return err
 	}
@@ -154,7 +146,7 @@ func upload(fileName, path, bucket string) error {
 	}
 	defer file.Close()
 
-	uploader, err := s3.GetManager()
+	uploader, err := awsStore.GetManager()
 	item := &s3manager.UploadInput{
 		Bucket:   aws.String(bucket),
 		Key:      aws.String(fileName),

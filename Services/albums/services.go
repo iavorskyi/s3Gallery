@@ -4,13 +4,13 @@ import (
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	awsS3 "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/iavorskyi/s3gallery/Services/s3"
+	awsStore "github.com/iavorskyi/s3gallery/internal/store/awsS3"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 func ListAlbums() ([]*awsS3.Bucket, int, error) {
-	client, err := s3.GetClient()
+	client, err := awsStore.GetClient()
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -22,7 +22,7 @@ func ListAlbums() ([]*awsS3.Bucket, int, error) {
 }
 
 func GetAlbum(albumID string) (*awsS3.Bucket, int, error) {
-	client, err := s3.GetClient()
+	client, err := awsStore.GetClient()
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -44,7 +44,7 @@ func GetAlbum(albumID string) (*awsS3.Bucket, int, error) {
 }
 
 func CreateAlbum(bucketName string) (int, error) {
-	client, err := s3.GetClient()
+	client, err := awsStore.GetClient()
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

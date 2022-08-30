@@ -2,22 +2,25 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/iavorskyi/s3gallery/Services/auth"
 	"github.com/iavorskyi/s3gallery/internal/store"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 type server struct {
-	router *gin.Engine
-	logger *logrus.Logger
-	store  store.Store
+	router  *gin.Engine
+	logger  *logrus.Logger
+	store   store.Store
+	s3store store.S3Store
 }
 
-func newServer(store store.Store) *server {
+func newServer(store store.Store, s3store store.S3Store) *server {
 	s := &server{
-		router: gin.Default(),
-		logger: logrus.New(),
-		store:  store,
+		router:  gin.Default(),
+		logger:  logrus.New(),
+		store:   store,
+		s3store: s3store,
 	}
 	s.configureRouter()
 
@@ -32,7 +35,7 @@ func (s *server) configureRouter() {
 	s.router.POST("/sign-up", s.signUp)
 	s.router.POST("/sign-in", s.signIn)
 
-	//api := s.router.Group("/api")
+	api := s.router.Group("/api")
 	//api.GET("/", s.apiPing)
 	//
 	//users := api.Group("/users")
@@ -41,14 +44,14 @@ func (s *server) configureRouter() {
 	//users.PUT("/:id", s.updateUser)
 	//users.DELETE("/:id", s.deleteUser)
 	//
-	//albums := api.Group("/albums", auth.UserIdentity)
+	albums := api.Group("/albums", auth.UserIdentity)
 	//albums.GET("/", s.listAlbums)
 	//albums.GET("/:albumId", s.getAlbum)
 	//albums.POST("/", s.createAlbum)
 	//
-	//items := albums.Group(":albumId/items")
+	items := albums.Group(":albumId/items")
 	//items.POST("/", s.uploadItem)
-	//items.GET("/", s.listItems)
+	items.GET("/", s.listItems)
 	//items.GET("/:id", s.getItem)
 	//items.PUT("/:id", s.updateItem)
 	//items.DELETE("/:id", s.deleteItem)

@@ -1,27 +1,21 @@
 package api
 
-//
-//import (
-//	"github.com/gin-gonic/gin"
-//	"github.com/iavorskyi/s3gallery/Services/items"
-//	"github.com/iavorskyi/s3gallery/internal/model"
-//	"github.com/iavorskyi/s3gallery/s3Gallery"
-//	"net/http"
-//	"os"
-//)
-//
-//func (s *server) listItems(ctx *gin.Context) {
-//	var user model.User
-//	albumID := ctx.Param("albumId")
-//	itemList, code, err := items.ListItems(albumID)
-//	if err != nil {
-//		s3Gallery.NewErrorResponse(ctx, code, err.Error())
-//		return
-//	}
-//
-//	ctx.IndentedJSON(code, itemList)
-//}
-//
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/iavorskyi/s3gallery/Services/items"
+	"github.com/iavorskyi/s3gallery/s3Gallery"
+)
+
+func (s *server) listItems(ctx *gin.Context) {
+	albumID := ctx.Param("albumId")
+	itemList, code, err := items.ListItems(albumID, s.s3store)
+	if err != nil {
+		s3Gallery.NewErrorResponse(ctx, code, err.Error())
+		return
+	}
+	ctx.IndentedJSON(code, itemList)
+}
+
 //func (s *Server) getItem(ctx *gin.Context) {
 //	isFullSize := ctx.Query("full-size")
 //	albumID := ctx.Param("albumId")
