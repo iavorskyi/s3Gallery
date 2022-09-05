@@ -17,9 +17,17 @@ func Start(config *Config) error {
 	defer db.Close()
 
 	s3, err := awsStore.GetClient()
+	if err != nil {
+		return err
+	}
+	manager, err := awsStore.GetManager()
+	if err != nil {
+		return err
+	}
 
 	store := sqlStore.New(db)
-	s3store := awsStore.New(s3)
+
+	s3store := awsStore.New(s3, manager)
 	srv := newServer(store, s3store)
 	log.Println("Starting on", config.BindAddr, "port")
 

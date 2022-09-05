@@ -12,11 +12,12 @@ import "os"
 
 type AWSStore struct {
 	store          *s3.S3
+	manager        *s3manager.Uploader
 	itemRepository *ItemRepository
 }
 
-func New(s3 *s3.S3) *AWSStore {
-	return &AWSStore{store: s3}
+func New(s3 *s3.S3, manager *s3manager.Uploader) *AWSStore {
+	return &AWSStore{store: s3, manager: manager}
 }
 
 // DirectoryIterator represents an iterator of a specified directory

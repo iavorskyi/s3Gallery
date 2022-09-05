@@ -50,9 +50,9 @@ func (s *server) configureRouter() {
 	//albums.POST("/", s.createAlbum)
 	//
 	items := albums.Group(":albumId/items")
-	//items.POST("/", s.uploadItem)
+	items.POST("/", s.uploadItem)
 	items.GET("/", s.listItems)
-	//items.GET("/:id", s.getItem)
+	items.GET("/:id", s.getItem)
 	//items.PUT("/:id", s.updateItem)
-	//items.DELETE("/:id", s.deleteItem)
+	items.DELETE("/:id", s.deleteItem)
 }

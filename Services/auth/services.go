@@ -4,8 +4,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/iavorskyi/s3gallery/internal/model"
 	"github.com/iavorskyi/s3gallery/internal/store"
-	"log"
-
 	"time"
 )
 
@@ -29,7 +27,6 @@ func CreateUser(user model.User, db store.Store) (*model.User, error) {
 }
 
 func GenerateToken(user model.User, db store.Store) (string, error) {
-	log.Println("TEST:", db)
 	userID, err := db.User().FindByCredential(user.Email, user.Password)
 	if err != nil {
 		return "", err

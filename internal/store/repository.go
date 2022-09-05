@@ -1,7 +1,6 @@
 package store
 
 import (
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/iavorskyi/s3gallery/internal/model"
 )
 
@@ -13,5 +12,8 @@ type UserRepository interface {
 }
 
 type ItemRepository interface {
-	ListItemsByAlbumId(id string) (*s3.ListObjectsV2Output, error)
+	ListItemsByAlbumId(id string) ([]model.Item, error)
+	GetItemByAlbumIDAndID(bucketID, id string) (model.Item, error)
+	UploadItem(fileName, path, bucket string) (string, error)
+	DeleteItemByBucketIDAndItemID(bucketID, itemID string) error
 }
