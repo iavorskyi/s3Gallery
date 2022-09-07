@@ -3,9 +3,9 @@ package auth
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 )
 
 func ParseToken(accessToken string) (int, error) {
@@ -29,22 +29,31 @@ func ParseToken(accessToken string) (int, error) {
 }
 
 func UserIdentity(ctx *gin.Context) {
-	header := ctx.GetHeader("Authorization")
-	if header == "" {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, "empty auth header")
-		return
-	}
-
-	headersParts := strings.Split(header, " ")
-	if len(headersParts) != 2 {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, "invalid auth header")
-
-		return
-	}
-
-	userId, err := ParseToken(headersParts[1])
-	if err != nil {
+	//header := ctx.GetHeader("Authorization")
+	//if header == "" {
+	//	ctx.AbortWithStatusJSON(http.StatusUnauthorized, "empty auth header")
+	//	return
+	//}
+	//
+	//headersParts := strings.Split(header, " ")
+	//if len(headersParts) != 2 {
+	//	ctx.AbortWithStatusJSON(http.StatusUnauthorized, "invalid auth header")
+	//
+	//	return
+	//}
+	//
+	//userId, err := ParseToken(headersParts[1])
+	//if err != nil {
+	//	ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]interface{}{"message": "not authorized"})
+	//}
+	session := sessions.Default(ctx)
+	email := session.Get("user")
+	if email == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "unauthorized",
+		})
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, map[string]interface{}{"message": "not authorized"})
+
 	}
-	ctx.Set("userId", userId)
+	ctx.Set("userId", email)
 }

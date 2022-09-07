@@ -67,39 +67,13 @@ func UploadItem(fileName, path, bucketID string, s3Store store.S3Store) error {
 }
 
 func DeleteItem(bucket, item string, s3store store.S3Store) error {
-	//_, err = client.DeleteObject(&awsS3.DeleteObjectInput{
-	//	Bucket: aws.String(bucket),
-	//	Key:    aws.String(item),
-	//})
-	//if err != nil {
-	//	return err
-	//}
 	err := s3store.Item().DeleteItemByBucketIDAndItemID(bucket, item)
 	if err != nil {
 		return err
 	}
-
 	err = s3store.Item().DeleteItemByBucketIDAndItemID(bucket, "resized/"+item)
 	if err != nil {
 		return err
 	}
-
-	// Wait to assure item is deleted
-	//err = client.WaitUntilObjectNotExists(&awsS3.HeadObjectInput{
-	//	Bucket: aws.String(bucket),
-	//	Key:    aws.String(item),
-	//})
-	//if err != nil {
-	//	return err
-	//}
-	//// Wait to assure resized item is deleted
-	//err = client.WaitUntilObjectNotExists(&awsS3.HeadObjectInput{
-	//	Bucket: aws.String(bucket),
-	//	Key:    aws.String("resized/" + item),
-	//})
-	//if err != nil {
-	//	return err
-	//}
-
 	return nil
 }

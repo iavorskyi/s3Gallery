@@ -11,9 +11,10 @@ import (
 import "os"
 
 type AWSStore struct {
-	store          *s3.S3
-	manager        *s3manager.Uploader
-	itemRepository *ItemRepository
+	store           *s3.S3
+	manager         *s3manager.Uploader
+	itemRepository  *ItemRepository
+	AlbumRepository *AlbumRepository
 }
 
 func New(s3 *s3.S3, manager *s3manager.Uploader) *AWSStore {
@@ -69,4 +70,14 @@ func (s *AWSStore) Item() store.ItemRepository {
 		client: s,
 	}
 	return s.itemRepository
+}
+
+func (s *AWSStore) Album() store.AlbumRepository {
+	if s.AlbumRepository != nil {
+		return s.AlbumRepository
+	}
+	s.AlbumRepository = &AlbumRepository{
+		client: s,
+	}
+	return s.AlbumRepository
 }

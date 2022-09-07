@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/iavorskyi/s3gallery/Services/auth"
 	"github.com/iavorskyi/s3gallery/internal/store"
@@ -32,8 +34,12 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
+	sessionStore := cookie.NewStore([]byte("secret"))
+	s.router.Use(sessions.Sessions("mysession", sessionStore))
+
 	s.router.POST("/sign-up", s.signUp)
 	s.router.POST("/sign-in", s.signIn)
+	s.router.GET("/sign-out", s.signOut)
 
 	api := s.router.Group("/api")
 	//api.GET("/", s.apiPing)

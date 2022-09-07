@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/iavorskyi/s3gallery/Services/auth"
 	"github.com/iavorskyi/s3gallery/internal/model"
@@ -35,11 +36,25 @@ func (s *server) signIn(ctx *gin.Context) {
 	token, err := auth.GenerateToken(user, s.store)
 	if err != nil {
 		log.Println("Failed to sign in", user.Email, err)
-		ctx.String(http.StatusInternalServerError, err.Error())
 		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to sign in"+user.Email+err.Error())
+		ctx.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	session := sessions.Default(ctx)
+	session.Set("user", user.Email)
+	if err = session.Save(); err != nil {
+		s3Gallery.NewErrorResponse(ctx, http.StatusInternalServerError, "Failed to save session "+err.Error())
+		ctx.String(http.StatusInternalServerError, err.Error())
+		return
+	}
 	ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"token": token, "user": user.Email})
 
+}
+
+func (s *server) signOut(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+	session.Clear()
+
+	ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"message": "logged out"})
 }
