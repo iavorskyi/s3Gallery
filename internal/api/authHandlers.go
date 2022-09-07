@@ -55,6 +55,9 @@ func (s *server) signIn(ctx *gin.Context) {
 func (s *server) signOut(ctx *gin.Context) {
 	session := sessions.Default(ctx)
 	session.Clear()
-
+	err := session.Save()
+	if err != nil {
+		ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"message": err.Error()})
+	}
 	ctx.IndentedJSON(http.StatusOK, map[string]interface{}{"message": "logged out"})
 }
