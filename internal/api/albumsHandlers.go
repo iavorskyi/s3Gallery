@@ -15,7 +15,7 @@ func (s *server) listAlbums(ctx *gin.Context) {
 		s3Gallery.NewErrorResponse(ctx, code, "Failed to get list of albums: "+err.Error())
 		return
 	}
-	ctx.JSON(code, albumList)
+	ctx.IndentedJSON(code, albumList)
 }
 
 func (s *server) getAlbum(ctx *gin.Context) {

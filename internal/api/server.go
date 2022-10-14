@@ -2,27 +2,27 @@ package api
 
 import (
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/iavorskyi/s3gallery/Services/auth"
 	"github.com/iavorskyi/s3gallery/internal/store"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 type server struct {
-	router  *gin.Engine
-	logger  *logrus.Logger
-	store   store.Store
-	s3store store.S3Store
+	router       *gin.Engine
+	logger       *logrus.Logger
+	store        store.Store
+	s3store      store.S3Store
+	sessionStore sessions.Store
 }
 
-func newServer(store store.Store, s3store store.S3Store) *server {
+func newServer(store store.Store, s3store store.S3Store, sessionStore sessions.Store) *server {
 	s := &server{
-		router:  gin.Default(),
-		logger:  logrus.New(),
-		store:   store,
-		s3store: s3store,
+		router:       gin.Default(),
+		logger:       logrus.New(),
+		store:        store,
+		s3store:      s3store,
+		sessionStore: sessionStore,
 	}
 	s.configureRouter()
 
@@ -34,14 +34,13 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
-	sessionStore := cookie.NewStore([]byte("secret"))
-	s.router.Use(sessions.Sessions("mysession", sessionStore))
+	s.router.Use(sessions.Sessions("mysession", s.sessionStore))
 
 	s.router.POST("/sign-up", s.signUp)
 	s.router.POST("/sign-in", s.signIn)
 	s.router.GET("/sign-out", s.signOut)
 
-	api := s.router.Group("/api")
+	api := s.router.Group("/api", s.userIdentity)
 	//api.GET("/", s.apiPing)
 	//
 	//users := api.Group("/users")
@@ -50,8 +49,8 @@ func (s *server) configureRouter() {
 	//users.PUT("/:id", s.updateUser)
 	//users.DELETE("/:id", s.deleteUser)
 	//
-	albums := api.Group("/albums", auth.UserIdentity)
-	//albums.GET("/", s.listAlbums)
+	albums := api.Group("/albums")
+	albums.GET("/", s.listAlbums)
 	//albums.GET("/:albumId", s.getAlbum)
 	//albums.POST("/", s.createAlbum)
 	//

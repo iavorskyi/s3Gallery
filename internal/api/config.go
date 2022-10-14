@@ -2,13 +2,14 @@ package api
 
 // Config for API server
 type Config struct {
-	BindAddr     string `toml:"bind_addr"`
-	LogLevel     string `toml:"log_level"`
-	DBConnectStr string `toml:"connect_str"`
-	DBUser       string `toml:"user"`
-	DBName       string `toml:"name"`
-	DBPassword   string `toml:"password"`
-	S3Endpoint   string `toml:"s3endpoint"`
+	BindAddr        string `toml:"bind_addr"`
+	LogLevel        string `toml:"log_level"`
+	DBConnectStr    string `toml:"connect_str"`
+	DBUser          string `toml:"user"`
+	DBName          string `toml:"name"`
+	DBPassword      string `toml:"password"`
+	S3Endpoint      string `toml:"s3endpoint"`
+	SessionStoreKey string `toml:"session_store_key"`
 }
 
 // NewConfig ...

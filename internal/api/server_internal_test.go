@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/iavorskyi/s3gallery/Services/auth"
 	"github.com/iavorskyi/s3gallery/internal/model"
@@ -16,7 +17,7 @@ import (
 )
 
 func TestServer_signUp(t *testing.T) {
-	srv := newServer(testStore.New(), testS3store.New())
+	srv := newServer(testStore.New(), testS3store.New(), cookie.NewStore([]byte("secret")))
 
 	testCases := []struct {
 		name         string
@@ -72,8 +73,66 @@ func TestServer_signUp(t *testing.T) {
 	}
 }
 
+func TestServer_signIn(t *testing.T) {
+	u := model.TestUser(t)
+	userToSigIn := model.TestUser(t)
+	store := testStore.New()
+	store.User().Create(u)
+
+	srv := newServer(store, testS3store.New(), cookie.NewStore([]byte("secret")))
+
+	testCases := []struct {
+		name         string
+		payload      interface{}
+		expectedCode int
+	}{
+		{
+			name:         "success",
+			payload:      userToSigIn,
+			expectedCode: http.StatusOK,
+		},
+		{
+			name:         "invalid payload",
+			payload:      "invalid",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name: "success",
+			payload: map[string]string{
+				"email":    "user@example.com",
+				"password": "1",
+			},
+			expectedCode: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			rec := httptest.NewRecorder()
+			req, err := http.NewRequest(http.MethodPost, "/sign-in", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			jsonbytes, err := json.Marshal(tc.payload)
+			if err != nil {
+				t.Fatal(err)
+			}
+			ctx, _ := gin.CreateTestContext(rec)
+			ctx.Request = req
+			ctx.Request.Body = io.NopCloser(bytes.NewBuffer(jsonbytes))
+
+			srv.ServeHTTP(rec, req)
+
+			assert.Equal(t, tc.expectedCode, rec.Code)
+
+		})
+	}
+}
+
 func TestServer_listItems(t *testing.T) {
-	srv := newServer(testStore.New(), testS3store.New())
+	srv := newServer(testStore.New(), testS3store.New(), cookie.NewStore([]byte("secret")))
 
 	// add valid user
 	rec := httptest.NewRecorder()

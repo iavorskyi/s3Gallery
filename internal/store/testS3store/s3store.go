@@ -6,7 +6,8 @@ import (
 )
 
 type AWSStore struct {
-	itemRepository *ItemRepository
+	itemRepository  *ItemRepository
+	albumRepository *AlbumRepository
 }
 
 func New() *AWSStore {
@@ -22,4 +23,15 @@ func (s *AWSStore) Item() store.ItemRepository {
 		items:  make(map[string]*model.Item),
 	}
 	return s.itemRepository
+}
+
+func (s *AWSStore) Album() store.AlbumRepository {
+	if s.itemRepository != nil {
+		return s.albumRepository
+	}
+	s.itemRepository = &ItemRepository{
+		client: s,
+		items:  make(map[string]*model.Item),
+	}
+	return s.albumRepository
 }

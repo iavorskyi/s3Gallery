@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/go-pg/pg/v10"
 	awsStore "github.com/iavorskyi/s3gallery/internal/store/awsS3"
 	"github.com/iavorskyi/s3gallery/internal/store/sqlStore"
@@ -28,7 +29,9 @@ func Start(config *Config) error {
 	store := sqlStore.New(db)
 
 	s3store := awsStore.New(s3, manager)
-	srv := newServer(store, s3store)
+
+	sessionStore := cookie.NewStore([]byte(config.SessionStoreKey))
+	srv := newServer(store, s3store, sessionStore)
 	log.Println("Starting on", config.BindAddr, "port")
 
 	return http.ListenAndServe(config.BindAddr, srv)

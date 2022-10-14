@@ -8,14 +8,8 @@ import (
 )
 
 const (
-	signingKey = "someSecretKey"
-	tokenTTL   = 12 * time.Hour
+	tokenTTL = 12 * time.Hour
 )
-
-type tokenClaims struct {
-	jwt.StandardClaims
-	UserId int `json:"user_id"`
-}
 
 func CreateUser(user model.User, db store.Store) (*model.User, error) {
 	err := db.User().Create(&user)
@@ -32,7 +26,7 @@ func GenerateToken(user model.User, db store.Store) (string, error) {
 		return "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &model.TokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
@@ -40,7 +34,7 @@ func GenerateToken(user model.User, db store.Store) (string, error) {
 		userID,
 	})
 
-	signedToken, err := token.SignedString([]byte(signingKey))
+	signedToken, err := token.SignedString([]byte(model.SigningKey))
 	if err != nil {
 		return "", err
 	}
