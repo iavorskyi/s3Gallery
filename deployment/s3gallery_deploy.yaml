@@ -52,7 +52,7 @@ kind: Service
 metadata:
   labels:
     app: s3gallery
-  name: s3gallery
+  name: s3gallery-svc
 spec:
   type: LoadBalancer
   ports:
