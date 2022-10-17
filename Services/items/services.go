@@ -1,74 +1,35 @@
 package items
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	awsS3 "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/iavorskyi/s3gallery/Services/s3"
-	"github.com/iavorskyi/s3gallery/s3Gallery"
+	"github.com/iavorskyi/s3gallery/internal/model"
+	"github.com/iavorskyi/s3gallery/internal/store"
 	"github.com/nfnt/resize"
 	"image"
 	"image/jpeg"
-	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
-func ListItems(id string) ([]s3Gallery.Item, int, error) {
-	client, err := s3.GetClient()
+func ListItems(id string, s3store store.S3Store) ([]model.Item, int, error) {
+	// Get the list of items
+	items, err := s3store.Item().ListItemsByAlbumId(id)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
 
-	// Get the list of items
-	results, err := client.ListObjectsV2(&awsS3.ListObjectsV2Input{Bucket: aws.String(id)})
-	if err != nil {
-		log.Println(err)
-		return nil, http.StatusInternalServerError, err
-	}
-
-	var resultList []s3Gallery.Item
-	for _, i := range results.Contents {
-		if strings.Contains(*i.Key, "resized/") {
-			itemToList, _, err := GetItem(id, *i.Key)
-			if err != nil {
-				return nil, http.StatusBadRequest, err
-			}
-			resultList = append(resultList, itemToList)
-		}
-
-	}
-
-	return resultList, http.StatusOK, nil
+	return items, http.StatusOK, nil
 }
 
-func GetItem(bucketID, itemID string) (s3Gallery.Item, int, error) {
-	var item *awsS3.GetObjectOutput
-
-	client, err := s3.GetClient()
+func GetItem(bucketID, itemID string, s3Store store.S3Store) (model.Item, int, error) {
+	item, err := s3Store.Item().GetItemByAlbumIDAndID(bucketID, itemID)
 	if err != nil {
-		return s3Gallery.Item{}, http.StatusInternalServerError, err
+		return item, http.StatusInternalServerError, err
 	}
-
-	// Get the list of items
-	item, err = client.GetObject(&awsS3.GetObjectInput{Bucket: aws.String(bucketID), Key: aws.String(itemID)})
-	if err != nil {
-		log.Println(err.Error())
-		return s3Gallery.Item{}, http.StatusInternalServerError, err
-	}
-	var itemSummary = s3Gallery.Item{Name: itemID, Album: bucketID}
-	if item.ContentType != nil {
-		itemSummary.Type = *item.ContentType
-	}
-	if item.LastModified != nil {
-		itemSummary.LastModified = *item.LastModified
-	}
-	return itemSummary, http.StatusOK, nil
+	return item, http.StatusOK, nil
 }
 
-func UploadItem(fileName, path, bucketID string) error {
-	err := upload(fileName, path, bucketID)
+func UploadItem(fileName, path, bucketID string, s3Store store.S3Store) error {
+	_, err := s3Store.Item().UploadItem(fileName, path, bucketID)
 	if err != nil {
 		return err
 	}
@@ -97,7 +58,7 @@ func UploadItem(fileName, path, bucketID string) error {
 
 	resizedFileName := "resized/" + fileName
 	resizedFilePath := "./rzdImg" + fileName + ".jpeg"
-	err = upload(resizedFileName, resizedFilePath, bucketID)
+	_, err = s3Store.Item().UploadItem(resizedFileName, resizedFilePath, bucketID)
 	if err != nil {
 		return err
 	}
@@ -105,63 +66,14 @@ func UploadItem(fileName, path, bucketID string) error {
 	return err
 }
 
-func DeleteItem(bucket, item string) error {
-	client, err := s3.GetClient()
+func DeleteItem(bucket, item string, s3store store.S3Store) error {
+	err := s3store.Item().DeleteItemByBucketIDAndItemID(bucket, item)
 	if err != nil {
 		return err
 	}
-	_, err = client.DeleteObject(&awsS3.DeleteObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(item),
-	})
+	err = s3store.Item().DeleteItemByBucketIDAndItemID(bucket, "resized/"+item)
 	if err != nil {
 		return err
 	}
-
-	// delete resized copy
-	_, err = client.DeleteObject(&awsS3.DeleteObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String("resized/" + item),
-	})
-	if err != nil {
-		return err
-	}
-
-	// Wait to assure item is deleted
-	err = client.WaitUntilObjectNotExists(&awsS3.HeadObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(item),
-	})
-	if err != nil {
-		return err
-	}
-	// Wait to assure resized item is deleted
-	err = client.WaitUntilObjectNotExists(&awsS3.HeadObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String("resized/" + item),
-	})
-	if err != nil {
-		return err
-	}
-
 	return nil
-}
-
-func upload(fileName, path, bucket string) error {
-	file, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	uploader, err := s3.GetManager()
-	item := &s3manager.UploadInput{
-		Bucket:   aws.String(bucket),
-		Key:      aws.String(fileName),
-		Body:     file,
-		Metadata: map[string]*string{"format": aws.String(".jpeg")},
-		ACL:      aws.String("public-read"),
-	}
-	_, err = uploader.Upload(item)
-	return err
 }

@@ -29,7 +29,5 @@ func TestMain(m *testing.M) {
 	if dbPassword == "" {
 		dbPassword = "QDiW2auJIOxv7Zm9C8kz643GUMgSh051"
 	}
-
 	os.Exit(m.Run())
-
 }
